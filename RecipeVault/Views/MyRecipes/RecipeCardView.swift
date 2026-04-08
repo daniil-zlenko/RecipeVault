@@ -5,26 +5,9 @@ struct RecipeCardView: View {
 
     var body: some View {
         HStack(spacing: 12) {
-            AsyncImage(url: recipe.imageUrl.isEmpty ? nil : URL(string: recipe.imageUrl)) { phase in
-                switch phase {
-                case .success(let image):
-                    image.resizable().aspectRatio(contentMode: .fill)
-                case .failure:
-                    placeholder
-                case .empty:
-                    if recipe.imageUrl.isEmpty {
-                        placeholder
-                    } else {
-                        Rectangle()
-                            .foregroundStyle(.gray.opacity(0.1))
-                            .overlay(ProgressView())
-                    }
-                @unknown default:
-                    EmptyView()
-                }
-            }
-            .frame(width: 80, height: 80)
-            .clipShape(RoundedRectangle(cornerRadius: 10))
+            recipeImage
+                .frame(width: 80, height: 80)
+                .clipShape(RoundedRectangle(cornerRadius: 10))
 
             VStack(alignment: .leading, spacing: 4) {
                 Text(recipe.title)
@@ -60,6 +43,34 @@ struct RecipeCardView: View {
         .background(.background)
         .clipShape(RoundedRectangle(cornerRadius: 12))
         .shadow(color: .black.opacity(0.08), radius: 4, x: 0, y: 2)
+    }
+
+    @ViewBuilder
+    private var recipeImage: some View {
+        if let data = recipe.imageData, let uiImage = UIImage(data: data) {
+            Image(uiImage: uiImage)
+                .resizable()
+                .aspectRatio(contentMode: .fill)
+        } else {
+            AsyncImage(url: recipe.imageUrl.isEmpty ? nil : URL(string: recipe.imageUrl)) { phase in
+                switch phase {
+                case .success(let image):
+                    image.resizable().aspectRatio(contentMode: .fill)
+                case .failure:
+                    placeholder
+                case .empty:
+                    if recipe.imageUrl.isEmpty {
+                        placeholder
+                    } else {
+                        Rectangle()
+                            .foregroundStyle(.gray.opacity(0.1))
+                            .overlay(ProgressView())
+                    }
+                @unknown default:
+                    EmptyView()
+                }
+            }
+        }
     }
 
     private var placeholder: some View {

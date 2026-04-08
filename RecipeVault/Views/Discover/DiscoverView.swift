@@ -37,13 +37,24 @@ struct DiscoverView: View {
                                 MealCardView(meal: meal)
                             }
                             .buttonStyle(.plain)
+                            .onAppear {
+                                if meal.idMeal == viewModel.meals.last?.idMeal {
+                                    Task { await viewModel.loadMoreMeals() }
+                                }
+                            }
+                        }
+
+                        if viewModel.isLoadingMore {
+                            ProgressView()
+                                .frame(maxWidth: .infinity)
+                                .padding(.vertical, 16)
                         }
                     }
                     .padding(16)
                 }
             }
         }
-        .navigationTitle("Discover")
+        .navigationTitle("Discover Any Meal")
         .task {
             if viewModel.meals.isEmpty {
                 await viewModel.loadRandomMeals()

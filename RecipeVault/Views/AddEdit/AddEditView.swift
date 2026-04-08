@@ -1,10 +1,12 @@
 import SwiftUI
 import SwiftData
+import PhotosUI
 
 struct AddEditView: View {
     let recipeId: UUID?
 
     @State private var viewModel = AddEditViewModel()
+    @State private var selectedPhoto: PhotosPickerItem? = nil
     @Environment(\.modelContext) private var modelContext
     @Environment(\.dismiss) private var dismiss
 
@@ -34,13 +36,42 @@ struct AddEditView: View {
                     .frame(minHeight: 150)
             }
 
-            Section("Image URL") {
-                TextField("https://...", text: $viewModel.imageUrl)
+            Section("Image") {
+                if let data = viewModel.selectedImageData, let uiImage = UIImage(data: data) {
+                    Image(uiImage: uiImage)
+                        .resizable()
+                        .aspectRatio(contentMode: .fill)
+                        .frame(maxWidth: .infinity)
+                        .frame(height: 180)
+                        .clipped()
+                        .clipShape(RoundedRectangle(cornerRadius: 8))
+                        .listRowInsets(EdgeInsets())
+                }
+
+                PhotosPicker(selection: $selectedPhoto, matching: .images) {
+                    Label("Choose from Photos", systemImage: "photo")
+                }
+                .onChange(of: selectedPhoto) { _, newItem in
+                    Task {
+                        if let data = try? await newItem?.loadTransferable(type: Data.self) {
+                            viewModel.selectedImageData = data
+                            viewModel.imageUrl = ""
+                        }
+                    }
+                }
+
+                TextField("or paste image URL", text: $viewModel.imageUrl)
                     .autocorrectionDisabled()
                     #if os(iOS)
                     .keyboardType(.URL)
                     .textInputAutocapitalization(.never)
                     #endif
+                    .onChange(of: viewModel.imageUrl) { _, newValue in
+                        if !newValue.isEmpty {
+                            viewModel.selectedImageData = nil
+                            selectedPhoto = nil
+                        }
+                    }
             }
 
             Section {

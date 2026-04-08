@@ -132,22 +132,28 @@ private struct LocalDetailContent: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
-            AsyncImage(url: recipe.imageUrl.isEmpty ? nil : URL(string: recipe.imageUrl)) { phase in
-                switch phase {
-                case .success(let image):
-                    image.resizable().aspectRatio(contentMode: .fill)
-                        .frame(maxWidth: .infinity).frame(height: 280).clipped()
-                case .failure:
-                    imagePlaceholder
-                case .empty:
-                    if recipe.imageUrl.isEmpty {
+            if let data = recipe.imageData, let uiImage = UIImage(data: data) {
+                Image(uiImage: uiImage)
+                    .resizable().aspectRatio(contentMode: .fill)
+                    .frame(maxWidth: .infinity).frame(height: 280).clipped()
+            } else {
+                AsyncImage(url: recipe.imageUrl.isEmpty ? nil : URL(string: recipe.imageUrl)) { phase in
+                    switch phase {
+                    case .success(let image):
+                        image.resizable().aspectRatio(contentMode: .fill)
+                            .frame(maxWidth: .infinity).frame(height: 280).clipped()
+                    case .failure:
                         imagePlaceholder
-                    } else {
-                        Rectangle().foregroundStyle(.gray.opacity(0.1)).frame(height: 280)
-                            .overlay(ProgressView())
+                    case .empty:
+                        if recipe.imageUrl.isEmpty {
+                            imagePlaceholder
+                        } else {
+                            Rectangle().foregroundStyle(.gray.opacity(0.1)).frame(height: 280)
+                                .overlay(ProgressView())
+                        }
+                    @unknown default:
+                        EmptyView()
                     }
-                @unknown default:
-                    EmptyView()
                 }
             }
 

@@ -9,6 +9,7 @@ class AddEditViewModel {
     var ingredients = ""
     var instructions = ""
     var imageUrl = ""
+    var selectedImageData: Data? = nil
 
     var titleError: String? = nil
     var ingredientsError: String? = nil
@@ -22,6 +23,7 @@ class AddEditViewModel {
         ingredients = item.ingredients
         instructions = item.instructions
         imageUrl = item.imageUrl
+        selectedImageData = item.imageData
     }
 
     private func validate() -> Bool {
@@ -53,6 +55,7 @@ class AddEditViewModel {
             existing.ingredients = ingredients
             existing.instructions = instructions
             existing.imageUrl = imageUrl
+            existing.imageData = selectedImageData
             repository.updateRecipe(context: context)
         } else {
             let item = RecipeItem(
@@ -61,6 +64,7 @@ class AddEditViewModel {
                 ingredients: ingredients,
                 instructions: instructions,
                 imageUrl: imageUrl,
+                imageData: selectedImageData,
                 isFavourite: false,
                 isCustom: true
             )

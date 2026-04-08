@@ -9,6 +9,7 @@ class RecipeItem {
     var ingredients: String
     var instructions: String
     var imageUrl: String
+    var imageData: Data?
     var isFavourite: Bool
     var isCustom: Bool
     var createdAt: Date
@@ -20,6 +21,7 @@ class RecipeItem {
         ingredients: String = "",
         instructions: String = "",
         imageUrl: String = "",
+        imageData: Data? = nil,
         isFavourite: Bool = false,
         isCustom: Bool = true,
         createdAt: Date = Date()
@@ -30,6 +32,7 @@ class RecipeItem {
         self.ingredients = ingredients
         self.instructions = instructions
         self.imageUrl = imageUrl
+        self.imageData = imageData
         self.isFavourite = isFavourite
         self.isCustom = isCustom
         self.createdAt = createdAt
